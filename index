@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>北海道札幌 7 天 6 夜行程</title>
-    <!-- 引入 GitHub 樣式美化 Markdown -->
+    <!-- 引入 GitHub 風格樣式美化 Markdown -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.5.0/github-markdown.min.css">
     <!-- 引入 marked.js 解析器 -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
@@ -38,20 +38,22 @@
     <script>
         const gasApiUrl = 'https://script.google.com/macros/s/AKfycbzFRtKvX3EiI2R9UdK7EFQQDLC63r6u6IzvSy5OtwpiedbvEFAn11nOkE2dqpVD9rutoA/exec';
 
-        // 設定 marked 解析選項
-        marked.setOptions({
-            gfm: true,
-            breaks: true,
-            html: true
-        });
-
         fetch(gasApiUrl)
-            .then(response => response.text())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('HTTP error ' + response.status);
+                }
+                return response.text();
+            })
             .then(mdText => {
-                document.getElementById('content').innerHTML = marked.parse(mdText);
+                // 解析並呈現 Markdown 內容
+                document.getElementById('content').innerHTML = marked.parse(mdText, {
+                    gfm: true,
+                    breaks: true
+                });
             })
             .catch(error => {
-                document.getElementById('content').innerHTML = '載入失敗：' + error;
+                document.getElementById('content').innerHTML = '載入失敗：' + error.message;
             });
     </script>
 
