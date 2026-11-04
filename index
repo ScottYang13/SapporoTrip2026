@@ -3,23 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>北海道札幌 7 天 6 夜行程網頁</title>
+    <title>北海道札幌 7 天 6 夜行程</title>
+    <!-- 引入 marked.js 解析器 -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
-<body style="margin:0; padding:0;">
+<body style="margin: 0; padding: 0; background-color: #0f172a;">
 
-    <div id="app">載入中...</div>
+    <div id="content">資料載入中...</div>
 
     <script>
         const gasApiUrl = 'https://script.google.com/macros/s/AKfycbzFRtKvX3EiI2R9UdK7EFQQDLC63r6u6IzvSy5OtwpiedbvEFAn11nOkE2dqpVD9rutoA/exec';
 
-        fetch(gasApiUrl)
-            .then(res => res.text())
-            .then(html => {
-                const app = document.getElementById('app');
-                app.innerHTML = html;
+        // 在網址後面加上 ?t=時間戳記，避免瀏覽器快取舊資料
+        fetch(gasApiUrl + '?t=' + Date.now())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('HTTP 錯誤：' + response.status);
+                }
+                return response.text();
+            })
+            .then(mdText => {
+                const container = document.getElementById('content');
                 
-                // 重新執行傳回來的內嵌 <script>
-                const scripts = app.querySelectorAll("script");
+                // 1. 解析 Markdown 並轉為 HTML
+                container.innerHTML = marked.parse(mdText);
+
+                // 2. 強制重新執行內嵌 script
+                const scripts = container.querySelectorAll("script");
                 scripts.forEach(oldScript => {
                     const newScript = document.createElement("script");
                     Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
@@ -27,9 +37,10 @@
                     oldScript.parentNode.replaceChild(newScript, oldScript);
                 });
             })
-            .catch(err => {
-                document.getElementById('app').innerHTML = '載入失敗：' + err;
+            .catch(error => {
+                document.getElementById('content').innerHTML = '<p style="color:white; padding:20px;">載入失敗：' + error.message + '</p>';
             });
     </script>
+
 </body>
 </html>
