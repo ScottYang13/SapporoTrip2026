@@ -3,56 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>北海道札幌 7 天 6 夜行程</title>
-    <!-- 引入 GitHub Markdown 風格樣式 -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.5.0/github-markdown.min.css">
-    <!-- 引入 marked.js 解析器 -->
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <style>
-        body {
-            background-color: #0f172a;
-            padding: 20px;
-            margin: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-        }
-        .markdown-body {
-            box-sizing: border-box;
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 30px;
-            background-color: #ffffff;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-        }
-        @media (max-width: 767px) {
-            .markdown-body { padding: 15px; }
-        }
-    </style>
+    <title>北海道札幌 7 天 6 夜極致行程</title>
 </head>
-<body>
+<body style="margin:0; padding:0; background-color: #f1f5f9;">
 
-    <article class="markdown-body" id="content">資料載入中...</article>
+    <div id="app">行程資料載入中...</div>
 
     <script>
         const gasApiUrl = 'https://script.google.com/macros/s/AKfycbzFRtKvX3EiI2R9UdK7EFQQDLC63r6u6IzvSy5OtwpiedbvEFAn11nOkE2dqpVD9rutoA/exec';
 
-        // 加上防快取時間戳記
+        // 防快取時間戳記
         fetch(gasApiUrl + '?t=' + Date.now())
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('HTTP 錯誤狀態碼：' + response.status);
-                }
-                return response.text();
+            .then(res => {
+                if (!res.ok) throw new Error('HTTP 錯誤：' + res.status);
+                return res.text();
             })
-            .then(mdText => {
-                // 將 GAS 取得的 Markdown 文字轉譯為 HTML
-                document.getElementById('content').innerHTML = marked.parse(mdText, {
-                    gfm: true,
-                    breaks: true
+            .then(htmlContent => {
+                const app = document.getElementById('app');
+                app.innerHTML = htmlContent;
+
+                // 重新實體化並執行注入內容中的 <script> 標籤 (確保計時器與按鈕等互動生效)
+                const scripts = app.querySelectorAll("script");
+                scripts.forEach(oldScript => {
+                    const newScript = document.createElement("script");
+                    Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
+                    newScript.appendChild(document.createTextNode(oldScript.innerHTML));
+                    oldScript.parentNode.replaceChild(newScript, oldScript);
                 });
             })
-            .catch(error => {
-                document.getElementById('content').innerHTML = '載入失敗：' + error.message;
+            .catch(err => {
+                document.getElementById('app').innerHTML = '<p style="padding:20px; color:red;">載入失敗：' + err.message + '</p>';
             });
     </script>
 
