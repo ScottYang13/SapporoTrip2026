@@ -7,14 +7,15 @@
     <!-- 引入 marked.js 解析器 -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
-<body style="margin: 0; padding: 0; background-color: #0f172a;">
+<body style="margin: 0; padding: 20px; background-color: #0f172a; color: #ffffff;">
 
     <div id="content">資料載入中...</div>
 
     <script>
+        // 您的 Google Apps Script Web App 網址
         const gasApiUrl = 'https://script.google.com/macros/s/AKfycbzFRtKvX3EiI2R9UdK7EFQQDLC63r6u6IzvSy5OtwpiedbvEFAn11nOkE2dqpVD9rutoA/exec';
 
-        // 在網址後面加上 ?t=時間戳記，避免瀏覽器快取舊資料
+        // 加上 ?t= 時間戳記防瀏覽器快取
         fetch(gasApiUrl + '?t=' + Date.now())
             .then(response => {
                 if (!response.ok) {
@@ -24,11 +25,10 @@
             })
             .then(mdText => {
                 const container = document.getElementById('content');
-                
-                // 1. 解析 Markdown 並轉為 HTML
+                // 將 Markdown 轉為 HTML 寫入頁面
                 container.innerHTML = marked.parse(mdText);
 
-                // 2. 強制重新執行內嵌 script
+                // 執行內嵌的 <script> 標籤 (如有計時器或互動按鈕)
                 const scripts = container.querySelectorAll("script");
                 scripts.forEach(oldScript => {
                     const newScript = document.createElement("script");
@@ -38,7 +38,7 @@
                 });
             })
             .catch(error => {
-                document.getElementById('content').innerHTML = '<p style="color:white; padding:20px;">載入失敗：' + error.message + '</p>';
+                document.getElementById('content').innerHTML = '載入失敗：' + error.message;
             });
     </script>
 
