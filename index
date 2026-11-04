@@ -4,37 +4,51 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>北海道札幌 7 天 6 夜行程</title>
+    <!-- 引入 GitHub Markdown 風格樣式 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.5.0/github-markdown.min.css">
     <!-- 引入 marked.js 解析器 -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        body {
+            background-color: #0f172a;
+            padding: 20px;
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+        .markdown-body {
+            box-sizing: border-box;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 30px;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        }
+        @media (max-width: 767px) {
+            .markdown-body { padding: 15px; }
+        }
+    </style>
 </head>
-<body style="margin: 0; padding: 20px; background-color: #0f172a; color: #ffffff;">
+<body>
 
-    <div id="content">資料載入中...</div>
+    <article class="markdown-body" id="content">資料載入中...</article>
 
     <script>
-        // 您的 Google Apps Script Web App 網址
         const gasApiUrl = 'https://script.google.com/macros/s/AKfycbzFRtKvX3EiI2R9UdK7EFQQDLC63r6u6IzvSy5OtwpiedbvEFAn11nOkE2dqpVD9rutoA/exec';
 
-        // 加上 ?t= 時間戳記防瀏覽器快取
+        // 加上防快取時間戳記
         fetch(gasApiUrl + '?t=' + Date.now())
             .then(response => {
                 if (!response.ok) {
-                    throw new Error('HTTP 錯誤：' + response.status);
+                    throw new Error('HTTP 錯誤狀態碼：' + response.status);
                 }
                 return response.text();
             })
             .then(mdText => {
-                const container = document.getElementById('content');
-                // 將 Markdown 轉為 HTML 寫入頁面
-                container.innerHTML = marked.parse(mdText);
-
-                // 執行內嵌的 <script> 標籤 (如有計時器或互動按鈕)
-                const scripts = container.querySelectorAll("script");
-                scripts.forEach(oldScript => {
-                    const newScript = document.createElement("script");
-                    Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
-                    newScript.appendChild(document.createTextNode(oldScript.innerHTML));
-                    oldScript.parentNode.replaceChild(newScript, oldScript);
+                // 將 GAS 取得的 Markdown 文字轉譯為 HTML
+                document.getElementById('content').innerHTML = marked.parse(mdText, {
+                    gfm: true,
+                    breaks: true
                 });
             })
             .catch(error => {
